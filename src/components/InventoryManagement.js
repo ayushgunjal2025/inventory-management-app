@@ -1,0 +1,134 @@
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+
+const InventoryManagement = () => {
+  const [products, setProducts] = useState([]);
+  const [newProduct, setNewProduct] = useState({
+    name: '',
+    price: 0,
+    quantity: 0,
+    brand: '',
+    supplier: '',
+    oldStock: 0,
+    category: ''
+  });
+  const [editingProduct, setEditingProduct] = useState(null);
+
+  // Fetch products
+  const fetchProducts = () => {
+    axios.get('https://inventory-management-api-vfn1.onrender.com/api/v1/getProduct')
+      .then((response) => setProducts(response.data))
+      .catch((error) => console.error(error));
+  };
+
+  // Add new product
+  const addProduct = () => {
+    axios.post('https://inventory-management-api-vfn1.onrender.com/api/v1/createProduct', newProduct)
+      .then(() => {
+        fetchProducts();
+        resetForm();
+      })
+      .catch((error) => console.error(error));
+  };
+
+  // Update product
+  const updateProduct = () => {
+    axios.put(`https://inventory-management-api-vfn1.onrender.com/api/v1/product/${editingProduct._id}`, newProduct)
+      .then(() => {
+        fetchProducts();
+        resetForm();
+      })
+      .catch((error) => console.error(error));
+  };
+
+  // Delete product
+  const deleteProduct = (id) => {
+    axios.delete(`https://inventory-management-api-vfn1.onrender.com/api/v1/product/${id}`)
+      .then(() => fetchProducts())
+      .catch((error) => console.error(error));
+  };
+
+  // Edit product
+  const editProduct = (product) => {
+    setEditingProduct(product);
+    setNewProduct(product);
+  };
+
+  // Reset form
+  const resetForm = () => {
+    setEditingProduct(null);
+    setNewProduct({ name: '', price: 0, quantity: 0, brand: '', supplier: '', oldStock: 0, category: '' });
+  };
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  return (
+    <div className="inventory-management p-4 bg-gray-900 text-white">
+      <h2 className="text-center text-sky-600 text-2xl mb-4">Inventory Management</h2>
+
+      <div className="mb-6">
+        <button 
+          onClick={editingProduct ? updateProduct : addProduct} 
+          className="w-full p-2 bg-sky-600 text-white rounded hover:bg-sky-700 transition duration-200"
+        >
+          {editingProduct ? 'Update' : 'Save'}
+        </button>
+        {editingProduct && (
+          <button 
+            onClick={resetForm} 
+            className="mt-2 w-full p-2 bg-red-600 text-white rounded hover:bg-red-700 transition duration-200"
+          >
+            Cancel
+          </button>
+        )}
+      </div>
+
+      <h3 className="text-lg mb-2">Product List</h3>
+      <table className="min-w-full border border-gray-700">
+        <thead>
+          <tr className="bg-gray-800">
+            <th className="border border-gray-700 p-2 text-left">Product Name</th>
+            <th className="border border-gray-700 p-2 text-left">Price</th>
+            <th className="border border-gray-700 p-2 text-left">Quantity</th>
+            <th className="border border-gray-700 p-2 text-left">Brand</th>
+            <th className="border border-gray-700 p-2 text-left">Supplier</th>
+            <th className="border border-gray-700 p-2 text-left">Old Stock</th>
+            <th className="border border-gray-700 p-2 text-left">Category</th>
+            <th className="border border-gray-700 p-2 text-left">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {products.map((product) => (
+            <tr key={product._id} className="bg-gray-900">
+              <td className="border border-gray-700 p-2">{product.name}</td>
+              <td className="border border-gray-700 p-2">${product.price.toFixed(2)}</td>
+              <td className="border border-gray-700 p-2">{product.quantity}</td>
+              <td className="border border-gray-700 p-2">{product.brand}</td>
+              <td className="border border-gray-700 p-2">{product.supplier}</td>
+              <td className="border border-gray-700 p-2">{product.oldStock}</td>
+              <td className="border border-gray-700 p-2">{product.category}</td>
+              <td className="border border-gray-700 p-2">
+                <button 
+                  onClick={() => editProduct(product)} 
+                  className="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600"
+                >
+                  Edit
+                </button>
+                <button 
+                  onClick={() => deleteProduct(product._id)} 
+                  className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 ml-2"
+                >
+                  Delete
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};
+
+export default InventoryManagement;
