@@ -14,46 +14,61 @@ const InventoryManagement = () => {
   });
   const [editingProduct, setEditingProduct] = useState(null);
 
+  // Fetch products from the API
   const fetchProducts = () => {
     axios.get('https://inventory-management-api-vfn1.onrender.com/api/v1/getProduct')
       .then((response) => setProducts(response.data))
-      .catch((error) => console.error(error));
+      .catch((error) => console.error('Error fetching products:', error));
   };
 
+  // Add a new product
   const addProduct = () => {
-    axios.post('https://inventory-management-api-vfn1.onrender.com/api/v1/createProduct', newProduct)
-      .then(() => {
-        fetchProducts();
-        resetForm();
-      })
-      .catch((error) => console.error(error));
+    axios.post('https://inventory-management-api-vfn1.onrender.com/api/v1/createProduct', newProduct, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(() => {
+      fetchProducts();
+      resetForm();
+    })
+    .catch((error) => console.error('Error adding product:', error));
   };
 
+  // Update an existing product
   const updateProduct = () => {
-    axios.put(`https://inventory-management-api-vfn1.onrender.com/api/v1/product/${editingProduct._id}`, newProduct)
-      .then(() => {
-        fetchProducts();
-        resetForm();
-      })
-      .catch((error) => console.error(error));
+    axios.put(`https://inventory-management-api-vfn1.onrender.com/api/v1/product/${editingProduct._id}`, newProduct, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(() => {
+      fetchProducts();
+      resetForm();
+    })
+    .catch((error) => console.error('Error updating product:', error));
   };
 
+  // Delete a product
   const deleteProduct = (id) => {
     axios.delete(`https://inventory-management-api-vfn1.onrender.com/api/v1/product/${id}`)
       .then(() => fetchProducts())
-      .catch((error) => console.error(error));
+      .catch((error) => console.error('Error deleting product:', error));
   };
 
+  // Handle editing a product
   const editProduct = (product) => {
     setEditingProduct(product);
     setNewProduct(product);
   };
 
+  // Reset form to default
   const resetForm = () => {
     setEditingProduct(null);
     setNewProduct({ name: '', price: 0, quantity: 0, brand: '', supplier: '', oldStock: 0, category: '' });
   };
 
+  // Fetch products when the component is mounted
   useEffect(() => {
     fetchProducts();
   }, []);
@@ -62,7 +77,7 @@ const InventoryManagement = () => {
     <div className="inventory-management p-4 bg-gray-900 text-white">
       <h2 className="text-center text-sky-600 text-2xl mb-4">Inventory Management</h2>
 
-      {/* Input fields for product creation or editing */}
+      {/* Form to create or edit product */}
       <div className="mb-6">
         <input
           type="text"
