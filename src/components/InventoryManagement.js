@@ -21,6 +21,16 @@ const InventoryManagement = () => {
       .catch((error) => console.error('Error fetching products:', error));
   };
 
+  // Handle form submission for adding or updating a product
+  const handleSubmit = (e) => {
+    e.preventDefault(); // Prevent form from refreshing the page
+    if (editingProduct) {
+      updateProduct(); // Update product if editing
+    } else {
+      addProduct(); // Add a new product if not editing
+    }
+  };
+
   // Add a new product
   const addProduct = () => {
     axios.post('https://inventory-management-api-vfn1.onrender.com/api/v1/createProduct', newProduct, {
@@ -28,11 +38,11 @@ const InventoryManagement = () => {
         'Content-Type': 'application/json'
       }
     })
-    .then(() => {
-      fetchProducts();
-      resetForm();
-    })
-    .catch((error) => console.error('Error adding product:', error));
+      .then(() => {
+        fetchProducts();
+        resetForm();
+      })
+      .catch((error) => console.error('Error adding product:', error));
   };
 
   // Update an existing product
@@ -42,11 +52,11 @@ const InventoryManagement = () => {
         'Content-Type': 'application/json'
       }
     })
-    .then(() => {
-      fetchProducts();
-      resetForm();
-    })
-    .catch((error) => console.error('Error updating product:', error));
+      .then(() => {
+        fetchProducts();
+        resetForm();
+      })
+      .catch((error) => console.error('Error updating product:', error));
   };
 
   // Delete a product
@@ -78,13 +88,14 @@ const InventoryManagement = () => {
       <h2 className="text-center text-sky-600 text-2xl mb-4">Inventory Management</h2>
 
       {/* Form to create or edit product */}
-      <div className="mb-6">
+      <form onSubmit={handleSubmit} className="mb-6">
         <input
           type="text"
           placeholder="Product Name"
           value={newProduct.name}
           onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })}
           className="block w-full p-2 mb-2 border border-sky-600 rounded bg-gray-800 text-white focus:outline-none focus:ring focus:ring-sky-600"
+          required
         />
         <input
           type="number"
@@ -92,6 +103,7 @@ const InventoryManagement = () => {
           value={newProduct.price}
           onChange={(e) => setNewProduct({ ...newProduct, price: parseFloat(e.target.value) })}
           className="block w-full p-2 mb-2 border border-sky-600 rounded bg-gray-800 text-white focus:outline-none focus:ring focus:ring-sky-600"
+          required
         />
         <input
           type="number"
@@ -99,6 +111,7 @@ const InventoryManagement = () => {
           value={newProduct.quantity}
           onChange={(e) => setNewProduct({ ...newProduct, quantity: parseInt(e.target.value) })}
           className="block w-full p-2 mb-2 border border-sky-600 rounded bg-gray-800 text-white focus:outline-none focus:ring focus:ring-sky-600"
+          required
         />
         <input
           type="text"
@@ -106,6 +119,7 @@ const InventoryManagement = () => {
           value={newProduct.brand}
           onChange={(e) => setNewProduct({ ...newProduct, brand: e.target.value })}
           className="block w-full p-2 mb-2 border border-sky-600 rounded bg-gray-800 text-white focus:outline-none focus:ring focus:ring-sky-600"
+          required
         />
         <input
           type="text"
@@ -113,6 +127,7 @@ const InventoryManagement = () => {
           value={newProduct.supplier}
           onChange={(e) => setNewProduct({ ...newProduct, supplier: e.target.value })}
           className="block w-full p-2 mb-2 border border-sky-600 rounded bg-gray-800 text-white focus:outline-none focus:ring focus:ring-sky-600"
+          required
         />
         <input
           type="number"
@@ -120,6 +135,7 @@ const InventoryManagement = () => {
           value={newProduct.oldStock}
           onChange={(e) => setNewProduct({ ...newProduct, oldStock: parseInt(e.target.value) })}
           className="block w-full p-2 mb-2 border border-sky-600 rounded bg-gray-800 text-white focus:outline-none focus:ring focus:ring-sky-600"
+          required
         />
         <input
           type="text"
@@ -127,24 +143,26 @@ const InventoryManagement = () => {
           value={newProduct.category}
           onChange={(e) => setNewProduct({ ...newProduct, category: e.target.value })}
           className="block w-full p-2 mb-4 border border-sky-600 rounded bg-gray-800 text-white focus:outline-none focus:ring focus:ring-sky-600"
+          required
         />
 
-        <button 
-          onClick={editingProduct ? updateProduct : addProduct} 
+        <button
+          type="submit"
           className="w-full p-2 bg-sky-600 text-white rounded hover:bg-sky-700 transition duration-200"
         >
           {editingProduct ? 'Update' : 'Save'}
         </button>
 
         {editingProduct && (
-          <button 
-            onClick={resetForm} 
+          <button
+            onClick={resetForm}
+            type="button"
             className="mt-2 w-full p-2 bg-red-600 text-white rounded hover:bg-red-700 transition duration-200"
           >
             Cancel
           </button>
         )}
-      </div>
+      </form>
 
       {/* Product List */}
       <h3 className="text-lg mb-2">Product List</h3>
@@ -172,14 +190,14 @@ const InventoryManagement = () => {
               <td className="border border-gray-700 p-2">{product.oldStock}</td>
               <td className="border border-gray-700 p-2">{product.category}</td>
               <td className="border border-gray-700 p-2">
-                <button 
-                  onClick={() => editProduct(product)} 
+                <button
+                  onClick={() => editProduct(product)}
                   className="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600"
                 >
                   Edit
                 </button>
-                <button 
-                  onClick={() => deleteProduct(product._id)} 
+                <button
+                  onClick={() => deleteProduct(product._id)}
                   className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 ml-2"
                 >
                   Delete
