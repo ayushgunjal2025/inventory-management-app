@@ -14,14 +14,12 @@ const InventoryManagement = () => {
   });
   const [editingProduct, setEditingProduct] = useState(null);
 
-  // Fetch products
   const fetchProducts = () => {
     axios.get('https://inventory-management-api-vfn1.onrender.com/api/v1/getProduct')
       .then((response) => setProducts(response.data))
       .catch((error) => console.error(error));
   };
 
-  // Add new product
   const addProduct = () => {
     axios.post('https://inventory-management-api-vfn1.onrender.com/api/v1/createProduct', newProduct)
       .then(() => {
@@ -31,7 +29,6 @@ const InventoryManagement = () => {
       .catch((error) => console.error(error));
   };
 
-  // Update product
   const updateProduct = () => {
     axios.put(`https://inventory-management-api-vfn1.onrender.com/api/v1/product/${editingProduct._id}`, newProduct)
       .then(() => {
@@ -41,20 +38,17 @@ const InventoryManagement = () => {
       .catch((error) => console.error(error));
   };
 
-  // Delete product
   const deleteProduct = (id) => {
     axios.delete(`https://inventory-management-api-vfn1.onrender.com/api/v1/product/${id}`)
       .then(() => fetchProducts())
       .catch((error) => console.error(error));
   };
 
-  // Edit product
   const editProduct = (product) => {
     setEditingProduct(product);
     setNewProduct(product);
   };
 
-  // Reset form
   const resetForm = () => {
     setEditingProduct(null);
     setNewProduct({ name: '', price: 0, quantity: 0, brand: '', supplier: '', oldStock: 0, category: '' });
@@ -68,13 +62,65 @@ const InventoryManagement = () => {
     <div className="inventory-management p-4 bg-gray-900 text-white">
       <h2 className="text-center text-sky-600 text-2xl mb-4">Inventory Management</h2>
 
+      {/* Input fields for product creation or editing */}
       <div className="mb-6">
+        <input
+          type="text"
+          placeholder="Product Name"
+          value={newProduct.name}
+          onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })}
+          className="block w-full p-2 mb-2 border border-sky-600 rounded bg-gray-800 text-white focus:outline-none focus:ring focus:ring-sky-600"
+        />
+        <input
+          type="number"
+          placeholder="Product Price"
+          value={newProduct.price}
+          onChange={(e) => setNewProduct({ ...newProduct, price: parseFloat(e.target.value) })}
+          className="block w-full p-2 mb-2 border border-sky-600 rounded bg-gray-800 text-white focus:outline-none focus:ring focus:ring-sky-600"
+        />
+        <input
+          type="number"
+          placeholder="Product Quantity"
+          value={newProduct.quantity}
+          onChange={(e) => setNewProduct({ ...newProduct, quantity: parseInt(e.target.value) })}
+          className="block w-full p-2 mb-2 border border-sky-600 rounded bg-gray-800 text-white focus:outline-none focus:ring focus:ring-sky-600"
+        />
+        <input
+          type="text"
+          placeholder="Brand"
+          value={newProduct.brand}
+          onChange={(e) => setNewProduct({ ...newProduct, brand: e.target.value })}
+          className="block w-full p-2 mb-2 border border-sky-600 rounded bg-gray-800 text-white focus:outline-none focus:ring focus:ring-sky-600"
+        />
+        <input
+          type="text"
+          placeholder="Supplier"
+          value={newProduct.supplier}
+          onChange={(e) => setNewProduct({ ...newProduct, supplier: e.target.value })}
+          className="block w-full p-2 mb-2 border border-sky-600 rounded bg-gray-800 text-white focus:outline-none focus:ring focus:ring-sky-600"
+        />
+        <input
+          type="number"
+          placeholder="Old Stock"
+          value={newProduct.oldStock}
+          onChange={(e) => setNewProduct({ ...newProduct, oldStock: parseInt(e.target.value) })}
+          className="block w-full p-2 mb-2 border border-sky-600 rounded bg-gray-800 text-white focus:outline-none focus:ring focus:ring-sky-600"
+        />
+        <input
+          type="text"
+          placeholder="Category"
+          value={newProduct.category}
+          onChange={(e) => setNewProduct({ ...newProduct, category: e.target.value })}
+          className="block w-full p-2 mb-4 border border-sky-600 rounded bg-gray-800 text-white focus:outline-none focus:ring focus:ring-sky-600"
+        />
+
         <button 
           onClick={editingProduct ? updateProduct : addProduct} 
           className="w-full p-2 bg-sky-600 text-white rounded hover:bg-sky-700 transition duration-200"
         >
           {editingProduct ? 'Update' : 'Save'}
         </button>
+
         {editingProduct && (
           <button 
             onClick={resetForm} 
@@ -85,6 +131,7 @@ const InventoryManagement = () => {
         )}
       </div>
 
+      {/* Product List */}
       <h3 className="text-lg mb-2">Product List</h3>
       <table className="min-w-full border border-gray-700">
         <thead>
