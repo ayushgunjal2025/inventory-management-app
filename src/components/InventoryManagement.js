@@ -13,19 +13,16 @@ const InventoryManagement = () => {
     category: ''
   });
 
-  // API base URL
-  const API_URL = 'https://inventory-management-api-vfn1.onrender.com/api/v1';
-
-  // Fetch products from the backend
+  // Fetch products using the full API URL
   const fetchProducts = () => {
-    axios.get(`${API_URL}/getProduct`)
+    axios.get('https://inventory-management-api-vfn1.onrender.com/api/v1/getProduct')
       .then((response) => setProducts(response.data))
       .catch((error) => console.error(error));
   };
 
-  // Add a new product to the backend
+  // Add product using the full API URL
   const addProduct = () => {
-    axios.post(`${API_URL}/createProduct`, newProduct)
+    axios.post('https://inventory-management-api-vfn1.onrender.com/api/v1/createProduct', newProduct)
       .then(() => {
         fetchProducts();
         setNewProduct({ name: '', price: 0, quantity: 0, brand: '', supplier: '', oldStock: 0, category: '' });
