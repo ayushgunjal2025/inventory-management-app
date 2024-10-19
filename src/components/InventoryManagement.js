@@ -12,73 +12,27 @@ const InventoryManagement = () => {
     oldStock: 0,
     category: ''
   });
-  const [editingProduct, setEditingProduct] = useState(null);
 
-  // Fetch products from the API
+  // API base URL
+  const API_URL = 'https://inventory-management-api-vfn1.onrender.com/api/v1';
+
+  // Fetch products from the backend
   const fetchProducts = () => {
-    axios.get('https://inventory-management-api-vfn1.onrender.com/api/v1/getProduct')
+    axios.get(`${API_URL}/getProduct`)
       .then((response) => setProducts(response.data))
-      .catch((error) => console.error('Error fetching products:', error));
+      .catch((error) => console.error(error));
   };
 
-  // Handle form submission for adding or updating a product
-  const handleSubmit = (e) => {
-    e.preventDefault(); // Prevent form from refreshing the page
-    if (editingProduct) {
-      updateProduct(); // Update product if editing
-    } else {
-      addProduct(); // Add a new product if not editing
-    }
-  };
-
-  // Add a new product
+  // Add a new product to the backend
   const addProduct = () => {
-    axios.post('https://inventory-management-api-vfn1.onrender.com/api/v1/createProduct', newProduct, {
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    })
+    axios.post(`${API_URL}/createProduct`, newProduct)
       .then(() => {
         fetchProducts();
-        resetForm();
+        setNewProduct({ name: '', price: 0, quantity: 0, brand: '', supplier: '', oldStock: 0, category: '' });
       })
-      .catch((error) => console.error('Error adding product:', error));
+      .catch((error) => console.error(error));
   };
 
-  // Update an existing product
-  const updateProduct = () => {
-    axios.put(`https://inventory-management-api-vfn1.onrender.com/api/v1/product/${editingProduct._id}`, newProduct, {
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    })
-      .then(() => {
-        fetchProducts();
-        resetForm();
-      })
-      .catch((error) => console.error('Error updating product:', error));
-  };
-
-  // Delete a product
-  const deleteProduct = (id) => {
-    axios.delete(`https://inventory-management-api-vfn1.onrender.com/api/v1/product/${id}`)
-      .then(() => fetchProducts())
-      .catch((error) => console.error('Error deleting product:', error));
-  };
-
-  // Handle editing a product
-  const editProduct = (product) => {
-    setEditingProduct(product);
-    setNewProduct(product);
-  };
-
-  // Reset form to default
-  const resetForm = () => {
-    setEditingProduct(null);
-    setNewProduct({ name: '', price: 0, quantity: 0, brand: '', supplier: '', oldStock: 0, category: '' });
-  };
-
-  // Fetch products when the component is mounted
   useEffect(() => {
     fetchProducts();
   }, []);
@@ -87,15 +41,13 @@ const InventoryManagement = () => {
     <div className="inventory-management p-4 bg-gray-900 text-white">
       <h2 className="text-center text-sky-600 text-2xl mb-4">Inventory Management</h2>
 
-      {/* Form to create or edit product */}
-      <form onSubmit={handleSubmit} className="mb-6">
+      <div className="mb-6">
         <input
           type="text"
           placeholder="Product Name"
           value={newProduct.name}
           onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })}
           className="block w-full p-2 mb-2 border border-sky-600 rounded bg-gray-800 text-white focus:outline-none focus:ring focus:ring-sky-600"
-          required
         />
         <input
           type="number"
@@ -103,7 +55,6 @@ const InventoryManagement = () => {
           value={newProduct.price}
           onChange={(e) => setNewProduct({ ...newProduct, price: parseFloat(e.target.value) })}
           className="block w-full p-2 mb-2 border border-sky-600 rounded bg-gray-800 text-white focus:outline-none focus:ring focus:ring-sky-600"
-          required
         />
         <input
           type="number"
@@ -111,7 +62,6 @@ const InventoryManagement = () => {
           value={newProduct.quantity}
           onChange={(e) => setNewProduct({ ...newProduct, quantity: parseInt(e.target.value) })}
           className="block w-full p-2 mb-2 border border-sky-600 rounded bg-gray-800 text-white focus:outline-none focus:ring focus:ring-sky-600"
-          required
         />
         <input
           type="text"
@@ -119,7 +69,6 @@ const InventoryManagement = () => {
           value={newProduct.brand}
           onChange={(e) => setNewProduct({ ...newProduct, brand: e.target.value })}
           className="block w-full p-2 mb-2 border border-sky-600 rounded bg-gray-800 text-white focus:outline-none focus:ring focus:ring-sky-600"
-          required
         />
         <input
           type="text"
@@ -127,7 +76,6 @@ const InventoryManagement = () => {
           value={newProduct.supplier}
           onChange={(e) => setNewProduct({ ...newProduct, supplier: e.target.value })}
           className="block w-full p-2 mb-2 border border-sky-600 rounded bg-gray-800 text-white focus:outline-none focus:ring focus:ring-sky-600"
-          required
         />
         <input
           type="number"
@@ -135,7 +83,6 @@ const InventoryManagement = () => {
           value={newProduct.oldStock}
           onChange={(e) => setNewProduct({ ...newProduct, oldStock: parseInt(e.target.value) })}
           className="block w-full p-2 mb-2 border border-sky-600 rounded bg-gray-800 text-white focus:outline-none focus:ring focus:ring-sky-600"
-          required
         />
         <input
           type="text"
@@ -143,66 +90,40 @@ const InventoryManagement = () => {
           value={newProduct.category}
           onChange={(e) => setNewProduct({ ...newProduct, category: e.target.value })}
           className="block w-full p-2 mb-4 border border-sky-600 rounded bg-gray-800 text-white focus:outline-none focus:ring focus:ring-sky-600"
-          required
         />
-
-        <button
-          type="submit"
+        <button 
+          onClick={addProduct} 
           className="w-full p-2 bg-sky-600 text-white rounded hover:bg-sky-700 transition duration-200"
         >
-          {editingProduct ? 'Update' : 'Save'}
+          Save
         </button>
+      </div>
 
-        {editingProduct && (
-          <button
-            onClick={resetForm}
-            type="button"
-            className="mt-2 w-full p-2 bg-red-600 text-white rounded hover:bg-red-700 transition duration-200"
-          >
-            Cancel
-          </button>
-        )}
-      </form>
-
-      {/* Product List */}
       <h3 className="text-lg mb-2">Product List</h3>
-      <table className="min-w-full border border-gray-700">
+      
+      {/* Table to display products */}
+      <table className="w-full table-auto border-collapse border border-sky-600 text-center">
         <thead>
-          <tr className="bg-gray-800">
-            <th className="border border-gray-700 p-2 text-left">Product Name</th>
-            <th className="border border-gray-700 p-2 text-left">Price</th>
-            <th className="border border-gray-700 p-2 text-left">Quantity</th>
-            <th className="border border-gray-700 p-2 text-left">Brand</th>
-            <th className="border border-gray-700 p-2 text-left">Supplier</th>
-            <th className="border border-gray-700 p-2 text-left">Old Stock</th>
-            <th className="border border-gray-700 p-2 text-left">Category</th>
-            <th className="border border-gray-700 p-2 text-left">Actions</th>
+          <tr className="bg-sky-600">
+            <th className="border border-sky-600 p-2">Product Name</th>
+            <th className="border border-sky-600 p-2">Price ($)</th>
+            <th className="border border-sky-600 p-2">Quantity</th>
+            <th className="border border-sky-600 p-2">Brand</th>
+            <th className="border border-sky-600 p-2">Supplier</th>
+            <th className="border border-sky-600 p-2">Old Stock</th>
+            <th className="border border-sky-600 p-2">Category</th>
           </tr>
         </thead>
         <tbody>
           {products.map((product) => (
-            <tr key={product._id} className="bg-gray-900">
-              <td className="border border-gray-700 p-2">{product.name}</td>
-              <td className="border border-gray-700 p-2">${product.price.toFixed(2)}</td>
-              <td className="border border-gray-700 p-2">{product.quantity}</td>
-              <td className="border border-gray-700 p-2">{product.brand}</td>
-              <td className="border border-gray-700 p-2">{product.supplier}</td>
-              <td className="border border-gray-700 p-2">{product.oldStock}</td>
-              <td className="border border-gray-700 p-2">{product.category}</td>
-              <td className="border border-gray-700 p-2">
-                <button
-                  onClick={() => editProduct(product)}
-                  className="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600"
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => deleteProduct(product._id)}
-                  className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 ml-2"
-                >
-                  Delete
-                </button>
-              </td>
+            <tr key={product._id} className="bg-gray-800">
+              <td className="border border-sky-600 p-2">{product.name}</td>
+              <td className="border border-sky-600 p-2">${product.price.toFixed(2)}</td>
+              <td className="border border-sky-600 p-2">{product.quantity}</td>
+              <td className="border border-sky-600 p-2">{product.brand}</td>
+              <td className="border border-sky-600 p-2">{product.supplier}</td>
+              <td className="border border-sky-600 p-2">{product.oldStock}</td>
+              <td className="border border-sky-600 p-2">{product.category}</td>
             </tr>
           ))}
         </tbody>
